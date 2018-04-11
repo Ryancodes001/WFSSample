@@ -1,0 +1,51 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@using ThinkGeo.MapSuite;
+@using ThinkGeo.MapSuite.Drawing;
+@using ThinkGeo.MapSuite.Layers;
+@using ThinkGeo.MapSuite.Mvc;
+@using ThinkGeo.MapSuite.Styles;
+
+<script language="javascript" type="text/javascript">
+   function UpdateDynamicOverlay(layerName) {
+        Map1.ajaxCallAction("Home", "UpdateOverlay", { layer: layerName }, function (result) {
+            // Refresh overlay after callback7
+            Map1.redrawLayer("ShapeOverlay");
+        })
+   }
+    function SomeMethod(layerName) {
+        Map1.ajaxCallAction("Home", "WFS", { layer: layerName }, function (result) {
+            // Refresh overlay after callback7
+            Map1.redrawLayer("SomeWFS");
+        })
+    }
+
+</script>
+<div>
+    @{Html.ThinkGeo().Map("Map1", 600, 500)
+                              .MapBackground(new GeoSolidBrush(GeoColor.FromHtml("#E5E3DF")))
+                              .CurrentExtent(-131.22, 55.05, -54.03, 16.91)
+                              .MapUnit(GeographyUnit.DecimalDegree)
+                              .CustomOverlays(overlays =>
+                              {
+                                  overlays.WorldMapKitWmsWebOverlay();
+                                  overlays.LayerOverlay("ShapeOverlay", false, TileType.MultipleTile);
+
+                              })
+                              .Render();
+    }
+</div>
+<div>
+    <input id="chKAddUs" name="group1" type="radio" value="Show US States" onclick="UpdateDynamicOverlay('US')" />
+    Show US States
+    <br />
+    <input id="chKAddCounty" name="group1" type="radio" value="Show US Counties" onclick="UpdateDynamicOverlay('City')" />
+    Show US Cities
+    <br />
+    <input id="addWfs" name="group1" type="radio" value="Show WFS" onclick="SomeMethod('WFS')" />
+    Some WFS
+    <br />
+
+</div>
