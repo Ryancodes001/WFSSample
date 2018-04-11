@@ -82,6 +82,7 @@ namespace Quickstart.Controllers
                 map.CustomOverlays.Remove("SomeWFS");
             }
             map.CustomOverlays.Add(ov);
+
             //map.refresh
         }
 
