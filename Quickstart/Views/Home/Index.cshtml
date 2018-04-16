@@ -21,20 +21,28 @@
             Map1.redrawLayer("SomeWFS");
         })
     }
-
+    function AnotherWFS(layerName) {
+        Map1.ajaxCallAction("Home", "AnotherWFS", { layer: layerName }, function (result) {
+            // Refresh overlay after callback7
+            Map1.redrawLayer("AnotherWFS");
+        })
+    }
 </script>
 <div>
     @{Html.ThinkGeo().Map("Map1", 600, 500)
-                              .MapBackground(new GeoSolidBrush(GeoColor.FromHtml("#E5E3DF")))
-                              .CurrentExtent(-131.22, 55.05, -54.03, 16.91)
-                              .MapUnit(GeographyUnit.DecimalDegree)
-                              .CustomOverlays(overlays =>
-                              {
-                                  overlays.WorldMapKitWmsWebOverlay();
-                                  overlays.LayerOverlay("ShapeOverlay", false, TileType.MultipleTile);
+                                      .MapBackground(new GeoSolidBrush(GeoColor.FromHtml("#E5E3DF")))
+                                      .CurrentExtent(-131.22, 55.05, -54.03, 16.91)
+                                      .MapUnit(GeographyUnit.DecimalDegree)
+                                      .CustomOverlays(overlays =>
+                                      {
+                                          overlays.WorldMapKitWmsWebOverlay();
+                                          overlays.LayerOverlay("ShapeOverlay", false, TileType.MultipleTile);
+                                          overlays.LayerOverlay("SomeWFS", false, TileType.MultipleTile);
+                                          overlays.LayerOverlay("AnotherWFS", false, TileType.MultipleTile);
 
-                              })
-                              .Render();
+
+                                      })
+                                      .Render();
     }
 </div>
 <div>
@@ -47,5 +55,7 @@
     <input id="addWfs" name="group1" type="radio" value="Show WFS" onclick="SomeMethod('WFS')" />
     Some WFS
     <br />
-
+    <input id="AnotherWfs" name="group1" type="radio" value="Another WFS" onclick="AnotherWFS('AnotherWFS')" />
+    Another WFS
+    <br />
 </div>

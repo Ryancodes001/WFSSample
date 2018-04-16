@@ -3,6 +3,7 @@ using ThinkGeo.MapSuite;
 using ThinkGeo.MapSuite.Drawing;
 using ThinkGeo.MapSuite.Layers;
 using ThinkGeo.MapSuite.Mvc;
+using ThinkGeo.MapSuite.Shapes;
 using ThinkGeo.MapSuite.Styles;
 
 namespace Quickstart.Controllers
@@ -61,39 +62,42 @@ namespace Quickstart.Controllers
                 overlay.Layers.Add(countyLayer);
             }
         }
-   
+
+        [MapActionFilter]
+        public void AnotherWFS(Map map)
+        {
+           
+            WfsFeatureLayer wfs = new ThinkGeo.MapSuite.Layers.WfsFeatureLayer("https://demo.boundlessgeo.com/geoserver/wfs", "topp:states");
+            wfs.TimeoutInSeconds = 60;
+            Proj4Projection proj4Projection = new Proj4Projection(4326, 4326);
+            proj4Projection.Open();
+            wfs.FeatureSource.Projection = proj4Projection;
+            wfs.ZoomLevelSet.ZoomLevel01.DefaultLineStyle = LineStyles.CreateSimpleLineStyle(GeoColor.SimpleColors.BrightRed, 15, false);
+            wfs.ZoomLevelSet.ZoomLevel01.ApplyUntilZoomLevel = ApplyUntilZoomLevel.Level20;
+
+            LayerOverlay overlay = map.CustomOverlays["AnotherWFS"] as LayerOverlay;
+            overlay.Layers.Clear();
+            overlay.Layers.Add(wfs);
+        }
         [MapActionFilter]
         public void WFS(Map map)
         {
             //("https://demo.boundlessgeo.com/geoserver/wfs", "medford:bikelanes")
-            var wfs = new ThinkGeo.MapSuite.Layers.WfsFeatureLayer("https://geoservices.informatievlaanderen.be/overdrachtdiensten/GRB/wfs", "GRB:WLAS");
-            wfs.Open();
-            var s = wfs.QueryTools.GetAllFeatures(ThinkGeo.MapSuite.Shapes.ReturningColumnsType.AllColumns);
+            var wfs = new WfsFeatureLayer("https://geoservices.informatievlaanderen.be/overdrachtdiensten/GRB/wfs", "GRB:WLAS");
+            wfs.TimeoutInSeconds = 600;
+
+            Proj4Projection proj4Projection = new Proj4Projection(31370, 4326);
+            proj4Projection.Open();
+            wfs.FeatureSource.Projection = proj4Projection;
             wfs.ZoomLevelSet.ZoomLevel01.DefaultLineStyle = LineStyles.CreateSimpleLineStyle(GeoColor.SimpleColors.BrightRed, 15, false);
             wfs.ZoomLevelSet.ZoomLevel01.ApplyUntilZoomLevel = ApplyUntilZoomLevel.Level20;
-
-            wfs.SentWebRequest += Wfs_SentWebRequest;
-            wfs.RequestingDrawing += Wfs_RequestingDrawing;
+            
+         
             //do all events 
-            var ov = new ThinkGeo.MapSuite.Mvc.LayerOverlay("SomeWFS", false, ThinkGeo.MapSuite.Mvc.TileType.SingleTile);
-            ov.IsVisible = true;
-            if (map.CustomOverlays.Contains("SomeWFS"))
-            {
-                map.CustomOverlays.Remove("SomeWFS");
-            }
-            map.CustomOverlays.Add(ov);
-
-            //map.refresh
+            LayerOverlay overlay = map.CustomOverlays["SomeWFS"] as LayerOverlay;
+            overlay.Layers.Clear();
+            overlay.Layers.Add(wfs);
         }
 
-        private void Wfs_RequestingDrawing(object sender, RequestingDrawingLayerEventArgs e)
-        {
-            ;
-        }
-
-        private void Wfs_SentWebRequest(object sender, SentWebRequestEventArgs e)
-        {
-            ;
-        }
     }
 }
